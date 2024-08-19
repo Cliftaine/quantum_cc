@@ -156,3 +156,5 @@ cython_debug/
 
 scrapper_lambda.zip
 .DS_Store
+*.env
+Scrapper/.env
