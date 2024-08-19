@@ -16,13 +16,13 @@ Finance team needs a solution that tracks dollar price in Mexican Pesos for the 
 
 Access via API, and output like this:
 
-    ```json
+```json
     {
         "2024-06-01": "17.50",
         ...,
         "2024-06-12": "18.78"
     }
-    ```
+```
 
 ### Techstack
 
@@ -50,4 +50,21 @@ I will be add some more complexity for store sensible data or variables, like AW
 
 # How to Run the Project
 
+Get your API token from SIE and place it in the ```Scrapper/.env```
+```
+    API_TOKEN=...
+```
 
+Clone the project and make build_lambda.sh executable
+
+```bash
+    chmod +x build_lambda.sh
+```
+
+Then execute lambda to build the project
+
+```bash
+    ./build_lambda.sh
+```
+
+Now you can place it into S3 or uploadit manual to lambda. (Working on cloudformation)
