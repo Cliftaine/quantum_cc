@@ -68,3 +68,9 @@ Then execute lambda to build the project
 ```
 
 Now you can place it into S3, remember to place s3 bucket and key into
+
+For testing it, get the API URL (Cloudformation Output) and place inputDate param. eg ```inputDate=05/05/2024```
+
+
+
+
