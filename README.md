@@ -67,4 +67,4 @@ Then execute lambda to build the project
     ./build_lambda.sh
 ```
 
-Now you can place it into S3 or uploadit manual to lambda. (Working on cloudformation)
+Now you can place it into S3, remember to place s3 bucket and key into

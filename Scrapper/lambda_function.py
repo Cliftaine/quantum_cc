@@ -39,7 +39,11 @@ def get_range_dates(
     Returns:
         Tuple[str, str]: A tuple containing the first and last date of the month.
     """
-    input_datetime = datetime.datetime.strptime(input_date, input_format)
+    try:
+        input_datetime = datetime.datetime.strptime(input_date, input_format)
+    except ValueError as e:
+        raise ValueError(f"Invalid date format: {input_date}") from e
+
     end_date = input_datetime.strftime(sie_format)
     first_date = input_datetime.replace(day=1).strftime(sie_format)
 
@@ -60,18 +64,25 @@ def get_usd(start_date: str, end_date: str) -> Union[str, Tuple[None, str]]:
     base_url = os.environ.get("BASE_URL")
     api_token = os.environ.get("API_TOKEN")
 
+    if not base_url or not api_token:
+        return None, "Error: BASE_URL or API_TOKEN environment variables not set."
+
     url = f"{base_url}/{start_date}/{end_date}"
     headers = {
         "Bmx-Token": api_token,
         "Accept-Encoding": "gzip"
     }
 
-    response = requests.get(url, headers=headers, timeout=10)
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+    except requests.exceptions.RequestException:
+        return None, "API request failed"
 
-    if response.status_code != 200:
-        return None, f"Error: {response.status_code}"
-
-    return response.content.decode('utf-8')
+    try:
+        return response.content.decode('utf-8')
+    except UnicodeDecodeError:
+        return None, "Failed to decode response content"
 
 def make_json(body: str) -> Dict[str, str]:
     """
@@ -83,11 +94,17 @@ def make_json(body: str) -> Dict[str, str]:
     Returns:
         Dict[str, str]: A dictionary with dates as keys and formatted USD data as values.
     """
-    data = json.loads(body)
-    result = {}
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError:
+        return None, "Failed to parse JSON response"
 
-    for item in data["bmx"]["series"][0]["datos"]:
-        result[item["fecha"]] = f"{float(item['dato']):.2f}"
+    try:
+        result = {}
+        for item in data["bmx"]["series"][0]["datos"]:
+            result[item["fecha"]] = f"{float(item['dato']):.2f}"
+    except (KeyError, TypeError, ValueError):
+        return None, "Error processing JSON data"
 
     return result
 
